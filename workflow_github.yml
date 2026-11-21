@@ -1,0 +1,47 @@
+# Crea el APK de Cripto Señales en los servidores de GitHub (gratis).
+# Se lanza solo al subir cambios, o a mano desde la pestaña "Actions" → "Run workflow".
+# El APK queda en la ejecución, apartado "Artifacts" → CriptoSenales-apk.
+name: Crear APK de Cripto Señales
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, master]
+
+jobs:
+  apk:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Paquetes del sistema
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y git zip unzip openjdk-17-jdk autoconf libtool pkg-config \
+            zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo5 cmake libffi-dev libssl-dev
+
+      - name: Buildozer
+        run: |
+          pip install --upgrade Cython==0.29.33 virtualenv
+          pip install --upgrade buildozer
+
+      - name: Caché de las herramientas de Android (acelera las siguientes veces)
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.buildozer
+            .buildozer
+          key: buildozer-${{ runner.os }}-${{ hashFiles('buildozer.spec') }}
+
+      - name: Crear el APK (la primera vez tarda unos 20-40 minutos)
+        run: yes | buildozer -v android debug
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: CriptoSenales-apk
+          path: bin/*.apk

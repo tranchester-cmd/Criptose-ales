@@ -1,0 +1,67 @@
+﻿Cripto Señales para Android
+Autor: Luis Tranche Casado
+
+Esta carpeta es la app Android. Hace los mismos cálculos que el programa del ordenador:
+  main.py            pantallas táctiles (Kivy)
+  nucleo.py          señales, tu compra, semáforo y coordinación (sacado del programa de escritorio)
+  noticias.py        noticias, tono y predicción  (copia exacta del escritorio)
+  aprendizaje.py     módulo de IA                  (copia exacta del escritorio)
+  manual_android.py  manual de la app (botón «i»)
+  icon.png           icono
+  buildozer.spec     configuración del APK
+  workflow_github.yml  proceso que crea el APK en GitHub (se pega en GitHub, ver abajo)
+
+El APK (el instalador de Android) no se puede crear directamente en Windows.
+Hay dos formas. La A es la más sencilla.
+
+
+A) CON GITHUB (gratis, sin instalar nada)
+------------------------------------------
+1. Entra en https://github.com con tu cuenta (o crea una gratis).
+2. Arriba a la derecha: "+" → "New repository". Nombre: criptosenales. Puede ser privado.
+   Pulsa "Create repository".
+3. En la página del repositorio pulsa "uploading an existing file" y arrastra el contenido
+   de esta carpeta Android (main.py, nucleo.py, noticias.py, aprendizaje.py,
+   manual_android.py, icon.png, buildozer.spec...). Pulsa "Commit changes".
+4. Pestaña "Actions" → "set up a workflow yourself". Borra lo que aparece, pega el
+   contenido de workflow_github.yml (ábrelo con el Bloc de notas) y pulsa "Commit changes".
+5. El proceso "Crear APK de Cripto Señales" arranca solo (en "Actions"; si no, entra en él
+   y pulsa "Run workflow"). La primera vez tarda unos 20-40 minutos; las siguientes, menos.
+6. Cuando termine (tic verde), entra en la ejecución y descarga "CriptoSenales-apk"
+   en el apartado "Artifacts". Es un .zip con el .apk dentro.
+
+Cada vez que cambies algo y lo subas, GitHub crea el APK nuevo solo.
+
+
+B) CON WSL (Linux dentro de Windows)
+------------------------------------
+La primera vez descarga varios GB de herramientas de Android.
+1. PowerShell como administrador:   wsl --install -d Ubuntu-22.04    (reinicia si lo pide)
+2. Abre "Ubuntu 22.04" y ejecuta:
+     sudo apt update
+     sudo apt install -y git zip unzip openjdk-17-jdk python3-pip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo5 cmake libffi-dev libssl-dev
+     pip3 install --user --upgrade Cython==0.29.33 virtualenv buildozer
+     echo 'export PATH=$PATH:~/.local/bin/' >> ~/.bashrc && source ~/.bashrc
+3. Copia la carpeta DENTRO de Linux (compilar desde C: da errores raros):
+     cp -r /mnt/c/Users/Luis/Downloads/CriptoSenales/CriptoSenales/Android ~/criptosenales
+     cd ~/criptosenales
+4. Crea el APK:   buildozer -v android debug
+5. El APK queda en ~/criptosenales/bin/. Cópialo a Windows:
+     cp bin/*.apk /mnt/c/Users/Luis/Downloads/
+
+
+INSTALARLO EN EL MÓVIL
+----------------------
+- Pasa el .apk al móvil (cable, Drive, correo...) y ábrelo. Android pedirá permitir
+  "instalar aplicaciones desconocidas" para la app con la que lo abras: acéptalo.
+- O con el móvil conectado por USB y la depuración USB activada, desde Windows:
+     adb install -r CriptoSenales-1.0-arm64-v8a_armeabi-v7a-debug.apk
+- Para actualizar la app, instala el APK nuevo encima: se conservan los datos y lo aprendido.
+
+
+A TENER EN CUENTA
+-----------------
+- La app solo trabaja mientras está abierta (al abrirla descarga lo que falte).
+- La IA del móvil aprende por su cuenta, separada de la del ordenador.
+- Si cambias noticias.py o aprendizaje.py del programa de escritorio, copia también los
+  nuevos aquí para que el móvil calcule igual.
